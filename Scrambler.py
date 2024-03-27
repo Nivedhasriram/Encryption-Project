@@ -12,11 +12,23 @@ def arnold_cat_map(image):
 
     for i in range(height):
         for j in range(width):
-            new_i = (i + j) % height
-            new_j = (i + 2 * j) % width
+            new_i = (i + 2 * j) % height  # Modify the row index calculation
+            new_j = (i + 3 * j) % width   # Modify the column index calculation
             scrambled_image[new_i, new_j] = image[i, j]
 
     return scrambled_image
+
+def inverse_enhanced_arnold_cat_map(image):
+    height, width = image.shape[:2]
+    descrambled_image = np.zeros_like(image)
+
+    for i in range(height):
+        for j in range(width):
+            old_i = (2 * i - 3 * j) % height   # Modified row index calculation
+            old_j = (i - 2 * j) % width   # Modified column index calculation
+            descrambled_image[old_i, old_j] = image[i, j]
+
+    return descrambled_image
 
 # Path to the zip file containing the DICOM image
 zip_file_path = "Image.zip"
@@ -49,6 +61,14 @@ try:
     plt.subplot(1, 2, 2)
     plt.imshow(scrambled_image, cmap='gray')
     plt.title('Scrambled DICOM Image')
+    plt.axis('off')
+
+    descrambled_image = inverse_enhanced_arnold_cat_map(scrambled_image)
+
+    # Display the descrambled image
+    plt.subplot(3,4,4)
+    plt.imshow(descrambled_image, cmap='gray')
+    plt.title('Descrambled DICOM Image')
     plt.axis('off')
 
     plt.show()
