@@ -54,5 +54,4 @@ plt.title('Descrambled Image')
 plt.axis('off')
 plt.show()
 
-print("Descrambled image saved successfully.")
 
