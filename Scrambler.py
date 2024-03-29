@@ -24,8 +24,8 @@ def inverse_enhanced_arnold_cat_map(image):
 
     for i in range(height):
         for j in range(width):
-            old_i = (2 * i - 3 * j) % height   # Modified row index calculation
-            old_j = (i - 2 * j) % width   # Modified column index calculation
+            old_i = (2 * i - j) % height
+            old_j = (i - j) % width
             descrambled_image[old_i, old_j] = image[i, j]
 
     return descrambled_image
@@ -47,9 +47,9 @@ try:
     ds = pydicom.dcmread(filename)
     image = ds.pixel_array
 
+    plt.figure(figsize=(10, 10))
     # Display the original image
-    plt.figure(figsize=(8, 4))
-    plt.subplot(1, 2, 1)
+    plt.subplot(221)
     plt.imshow(image, cmap='gray')
     plt.title('Original DICOM Image')
     plt.axis('off')
@@ -58,7 +58,7 @@ try:
     scrambled_image = arnold_cat_map(image)
 
     # Display the scrambled image
-    plt.subplot(1, 2, 2)
+    plt.subplot(222)
     plt.imshow(scrambled_image, cmap='gray')
     plt.title('Scrambled DICOM Image')
     plt.axis('off')
@@ -66,7 +66,7 @@ try:
     descrambled_image = inverse_enhanced_arnold_cat_map(scrambled_image)
 
     # Display the descrambled image
-    plt.subplot(3,4,4)
+    plt.subplot(223)
     plt.imshow(descrambled_image, cmap='gray')
     plt.title('Descrambled DICOM Image')
     plt.axis('off')
