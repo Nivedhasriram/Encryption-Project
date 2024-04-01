@@ -114,21 +114,65 @@ def check_dicom_pixel_value_and_range(dicom_data):
     print("Minimum pixel value: {}".format(min_value))
     print("Maximum pixel value: {}".format(max_value))
 
-# Example usage
-# Load the DICOM image
 zip_file_path = "Image.zip"
 dicom_filename = "Image.dcm"
 
-# Extract the DICOM file from the zip folder
 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
     zip_ref.extract(dicom_filename)
 
-# Load DICOM image from the extracted folder
 dicom_path = dicom_filename
 dicom_data = pydicom.dcmread(dicom_path)
-
-# Check the pixel value and range of the DICOM image
 check_dicom_pixel_value_and_range(dicom_data)
 
-# Remove the extracted DICOM file
-# os.remove(dicom_path)
+#Xor scrambling 
+import numpy as np
+from PIL import Image
+import pydicom
+import zipfile
+import os
+
+zip_file_path = "Image_scrambled.zip"
+
+# Extract DICOM file from the zip archive
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall()
+
+dicom_filename = "Image_scrambled.dcm"
+
+# Load DICOM file
+dicom_path = os.path.join(os.getcwd(), dicom_filename)
+dicom_data = pydicom.dcmread(dicom_path)
+
+# Extract pixel data from DICOM
+image_array = dicom_data.pixel_array
+
+# Function to divide the image into blocks of size (block_size x block_size)
+def blockshaped(arr, nrows, ncols):
+    """
+    Returns an array of shape (n, nrows, ncols) where
+    n * nrows * ncols = arr.size
+
+    If arr is a 2D array, the returned array looks like 3D
+    """
+    h, w = arr.shape
+    return (arr.reshape(h // nrows, nrows, -1, ncols)
+               .swapaxes(1, 2)
+               .reshape(-1, nrows, ncols))
+
+block_size = 8
+image_blocks = blockshaped(image_array, block_size, block_size)
+
+# Generate a pseudo-random matrix of the same size as image_blocks
+random_matrix = np.random.randint(0, 256, size=image_blocks.shape, dtype=np.uint8)
+
+# Perform XOR operation between each block of the image and the random matrix
+xor_result_blocks = np.bitwise_xor(image_blocks, random_matrix)
+
+# Reshape the result back to the original shape
+xor_result = xor_result_blocks.reshape(image_array.shape)
+
+# Convert the result back to an image
+xor_image = Image.fromarray(xor_result)
+
+# Display the XORed image
+xor_image.show()
