@@ -42,8 +42,10 @@ def check_dicom_pixel_value_and_range(dicom_data):
     # Find the value range of the DICOM image
     min_value = dicom_data.pixel_array.min()
     max_value = dicom_data.pixel_array.max()
+    num_pixels = np.prod(dicom_data.pixel_array.shape)
     print("Minimum pixel value: {}".format(min_value))
     print("Maximum pixel value: {}".format(max_value))
+    print("Number of pixels: {}".format(num_pixels))
 
 zip_file_path = "Image.zip"
 dicom_filename = "Image.dcm"
