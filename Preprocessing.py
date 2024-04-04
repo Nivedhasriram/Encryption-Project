@@ -14,27 +14,29 @@ def input_dicom_image(dicom_path):
         return None
 
 def preprocess_dicom_image(dicom_image):
-    """
-    Preprocess the DICOM image to discover embeddable blocks using 3-bit MSB prediction.
-    """
     def find_combination_with_least_difference(block):
-        """
-        Find the combination of 3 MSB bits that gives the least difference when subtracted
-        from the first pixel of the block.
-        """
         predictor_pixel = block[0, 0]
         min_difference = float('inf')
         best_combination = None
+        msb_combinations = np.array([i * 32 for i in range(8)])
+        res = np.zeros((8, 8), dtype=int)  # Initialize res array
         
         # Possible combinations of the 3 MSB bits
-        for combination in range(8):
-            msb_combination = np.array([combination >> 2 & 1, combination >> 1 & 1, combination & 1])
-            difference = np.abs(predictor_pixel - int(''.join(map(str, msb_combination)), 2))
-            if difference < min_difference:
-                min_difference = difference
-                best_combination = msb_combination
-        
-        return best_combination
+        for i in range(1, 8):
+            for j in range(1, 8):
+                actual_pixel = block[i, j]
+                for value in msb_combinations:
+                    result = actual_pixel ^ value
+                    difference = abs(predictor_pixel - result)
+                    if difference < min_difference:
+                        min_difference = difference
+                        best_combination = value
+                if best_combination != actual_pixel:
+                    return 0  # Return immediately if a mismatch is found
+                else:
+                    res[i, j] = 1
+                    
+        return 1  # If no mismatches found, return 1
     
     pixel_data = dicom_image.pixel_array
     np_image = np.array(pixel_data)
@@ -47,16 +49,16 @@ def preprocess_dicom_image(dicom_image):
     for y in range(0, height, block_size):
         for x in range(0, width, block_size):
             block = np_image[y:y+block_size, x:x+block_size]
-        
+            
             if block.shape == (block_size, block_size):
-                best_combination = find_combination_with_least_difference(block)
-                differences = np.abs(block - int(''.join(map(str, best_combination)), 2))
-                
-                if np.all(differences <= -64):
-                    embeddable_blocks.append(block)
+                check = find_combination_with_least_difference(block)
+                if check == 1:
                     mark[y // block_size, x // block_size] = 1
-    
+                    embeddable_blocks.append(block)
+                     
     return embeddable_blocks, mark
+
+    
 
 # Example usage:
 dicom_path = "Image.dcm"
