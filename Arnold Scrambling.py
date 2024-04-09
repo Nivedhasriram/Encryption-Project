@@ -5,18 +5,28 @@ from pydicom.pixel_data_handlers.util import apply_voi_lut
 import zipfile
 import os
 
-# Load the DICOM image
-zip_file_path = "Image.zip"
 
-# Name of the DICOM file within the zip folder
-dicom_filename = "Image.dcm"
+def input_dicom_image(dicom_path):
+    """
+    Load the DICOM image from the specified path.
+    """
+    try:
+        dicom_image = pydicom.dcmread(dicom_path)
+        return dicom_image
+    except FileNotFoundError:
+        print("DICOM file not found")
+        return None
+    except Exception as e:
+        print("Error loading DICOM file:", e)
+        return None
+# zip_file_path = "Image3.zip"
+# dicom_filename = "Image3.dcm"
 
-# Extract the DICOM file from the zip folder
-with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-    zip_ref.extract(dicom_filename)
-
-# Load DICOM image from the extracted folder
-dicom_path = dicom_filename
+# with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+#     zip_ref.extract(dicom_filename)
+# dicom_path = dicom_filename
+dicom_path = "Image3.dcm"
+dicom_image = input_dicom_image(dicom_path)
 dicom_data = pydicom.dcmread(dicom_path)
 img = apply_voi_lut(dicom_data.pixel_array, dicom_data)
 
@@ -35,10 +45,8 @@ def arnold_cat_map(image, iterations):
                 image[x, y] = image[new_pos[0], new_pos[1]]
     return image
 
-# Apply Arnold's cat map to the DICOM image
 ACMimg = arnold_cat_map(img.copy(), 10)
 
-# Plotting
 plt.figure(figsize=(12, 10))
 
 # Original DICOM Image
@@ -67,3 +75,4 @@ plt.ylabel('Frequency')
 
 plt.tight_layout()
 plt.show()
+
