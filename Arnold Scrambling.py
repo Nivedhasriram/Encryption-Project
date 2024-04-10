@@ -29,6 +29,7 @@ dicom_path = "Image.dcm"
 dicom_image = input_dicom_image(dicom_path)
 dicom_data = pydicom.dcmread(dicom_path)
 img = apply_voi_lut(dicom_data.pixel_array, dicom_data)
+print(dicom_data)
 
 # Define the Arnold's cat map function
 # def arnold_cat_map(image, iterations):
