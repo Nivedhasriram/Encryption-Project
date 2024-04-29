@@ -19,32 +19,13 @@ def input_dicom_image(dicom_path):
     except Exception as e:
         print("Error loading DICOM file:", e)
         return None
-# zip_file_path = "Image3.zip"
-# dicom_filename = "Image3.dcm"
 
-# with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-#     zip_ref.extract(dicom_filename)
-# dicom_path = dicom_filename
-dicom_path = "Image.dcm"
+dicom_path = "Image2.dcm"
 dicom_image = input_dicom_image(dicom_path)
 dicom_data = pydicom.dcmread(dicom_path)
 img = apply_voi_lut(dicom_data.pixel_array, dicom_data)
 print(dicom_data)
 
-# Define the Arnold's cat map function
-# def arnold_cat_map(image, iterations):
-#     height, width = image.shape[:2]
-#     assert height == width, "Image should be square"
-#     assert height % 2 == 0, "Image size should be even"
-#     transformationMatrix = np.array([[2, 1], [1, 1]])
-
-#     for i in range(iterations):
-#         for x in range(height):
-#             for y in range(width):
-#                 old_pos = np.array([x, y])
-#                 new_pos = np.dot(transformationMatrix, old_pos) % height
-#                 image[x, y] = image[new_pos[0], new_pos[1]]
-#     return image
 def arnold_cat_map(image, iterations):
     height, width = image.shape
     print("Image shape:", image.shape)

@@ -1,2 +1,2 @@
-print(f"Block starting at (y={y}, x={x}):")
-                # print(block)
+for md5_value in md5_array:
+            print(md5_value)

@@ -26,8 +26,6 @@ matrix = np.random.randint(0, 2**16, size=(512, 512))
 print(matrix)
 
 
-
-
 #Pixel value for range 
 import zipfile
 import pydicom
